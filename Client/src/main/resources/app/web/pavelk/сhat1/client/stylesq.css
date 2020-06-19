@@ -1,0 +1,4 @@
+.button {
+    -fx-text-fill: blue;
+    -fx-background-color: linear-gradient(#fff 0%, rgba(175, 186, 187, 0.41) 10%, rgba(85, 115, 146, 0.5) 90%, rgba(31, 89, 128, 0.48) 100%);
+}
