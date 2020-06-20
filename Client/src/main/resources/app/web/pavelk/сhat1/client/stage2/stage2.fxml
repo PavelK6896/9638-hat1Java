@@ -1,10 +1,27 @@
 <?import javafx.scene.layout.VBox?>
 
+<?import java.net.URL?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Button?>
 
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuItem?>
 <VBox fx:controller="app.web.pavelk.сhat1.client.stage2.Controller2Client"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
+    <stylesheets><URL value="@styles1Stage2.css" /></stylesheets>
+
+    <MenuBar fx:id="menuBar">
+        <menus>
+            <Menu text="Меню">
+                <items>
+                    <MenuItem text="закрыть" > </MenuItem>
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+
+
     <TextArea fx:id="textArea" VBox.vgrow="ALWAYS"/>
     <Button text="Send Message" fx:id="btn" onAction="#sendMessage"/>
 </VBox>

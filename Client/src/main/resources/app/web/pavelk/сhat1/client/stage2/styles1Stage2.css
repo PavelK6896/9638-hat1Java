@@ -5,7 +5,6 @@
     background-color2: linear-gradient(rgba(78, 78, 78, 0.87) 0%, rgba(0, 0, 0, 0.86) 10%);
 }
 
-
 .button {
     -fx-text-fill: textColor;
     -fx-background-color: background-color2;
@@ -13,11 +12,6 @@
 
 .button:hover {
     -fx-background-color: hoverButton;
-}
-
-.text-field{
-    -fx-text-fill: textColor;
-    -fx-background-color: background-color2;
 }
 
 .text-area{

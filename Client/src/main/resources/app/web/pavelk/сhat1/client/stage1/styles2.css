@@ -1,8 +1,8 @@
 {
-    hoverButton: rgba(26, 26, 26, 0.91);
-    textColor: #dcdbdb;
+    textColor : rgba(26, 26, 26, 0.91);
+    hoverButton: #d7d6d6;
     -fx-font: 15px "Serif";
-    background-color2: linear-gradient(rgba(78, 78, 78, 0.87) 0%, rgba(0, 0, 0, 0.86) 10%);
+    background-color2: linear-gradient(rgba(255, 255, 255, 0.98) 0%, rgba(219, 219, 219, 0.35) 10%);
 }
 
 

@@ -3,10 +3,7 @@ package app.web.pavelk.сhat1.client.stage1;
 import app.web.pavelk.сhat1.client.stage2.Stage2Client;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,35 +13,37 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller1Chat implements Initializable {
     public TextField msgField;
-    public TextArea chatArea;
+    public TextArea TextArea;
     public HBox bottomPanel;
     public VBox upperPanel;
     public TextField loginField;
     public PasswordField passwordField;
     public ListView<String> clientsList;
+    public CheckMenuItem CheckMenuItemWhite;
+    public CheckMenuItem CheckMenuItemBlack;
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
     final String IP_ADDRESS = "localhost";
     final int PORT = 8189;
-    private boolean isAuthorized;
     List<TextArea> textAreas;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setAuthorized(false);
         textAreas = new ArrayList<>();
-        textAreas.add(chatArea);
+        textAreas.add(TextArea);
     }
 
     public void setAuthorized(boolean isAuthorized) {
-        this.isAuthorized = isAuthorized;
         if (!isAuthorized) {
             upperPanel.setVisible(true);
             upperPanel.setManaged(true);
@@ -82,7 +81,7 @@ public class Controller1Chat implements Initializable {
                         }
                     }
                 } catch (IOException e) {
-                    chatArea.appendText("ошибка авторизации\n");
+                    TextArea.appendText("ошибка авторизации\n");
                     e.printStackTrace();
                 }
             }
@@ -99,7 +98,7 @@ public class Controller1Chat implements Initializable {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
             } catch (IOException e) {
-                chatArea.appendText("ошибка подключения к серверу\n");
+                TextArea.appendText("ошибка подключения к серверу\n");
                 e.printStackTrace();
                 return false;
             }
@@ -123,7 +122,7 @@ public class Controller1Chat implements Initializable {
                         });
                     }
                 } else {
-                    chatArea.appendText(str + "\n");
+                    TextArea.appendText(str + "\n");
                 }
             }
         } catch (IOException e) {
@@ -140,7 +139,7 @@ public class Controller1Chat implements Initializable {
 
     public void sendMessage() {
         try {
-            out.writeUTF(msgField.getText());
+            out.writeUTF( msgField.getText() +" "+  getCurrentTime());
             msgField.clear();
             msgField.requestFocus();
         } catch (IOException e) {
@@ -155,5 +154,39 @@ public class Controller1Chat implements Initializable {
             stage2Client.show();
         }
     }
+
+    public void setBlack(){
+        CheckMenuItemWhite.setSelected(false);
+        CheckMenuItemBlack.setSelected(true);
+        Stage1Chat.setCss("styles1");
+    }
+
+    public void setWhite(){
+        CheckMenuItemWhite.setSelected(true);
+        CheckMenuItemBlack.setSelected(false);
+        Stage1Chat.setCss("styles2");
+    }
+
+    public void exit(){
+        Platform.exit();
+    }
+
+    public void stage1About(){
+        try {
+            Stage1Chat.setFXML("stage1About");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearTextArea(){
+        TextArea.clear();
+    }
+
+    public String getCurrentTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+    }
+
+
 }
 
