@@ -1,4 +1,4 @@
-package app.web.pavelk.сhat1.client;
+package app.web.pavelk.сhat1.client.stage1;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,9 +12,9 @@ public class Stage1Chat extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Stage1Chat.class.getResource("main.fxml"));
+        Parent root = FXMLLoader.load(Stage1Chat.class.getResource("stage1.fxml"));
         scene = new Scene(root, 400, 400);
-        scene.getStylesheets().add(Stage1Chat.class.getResource("stylesq.css").toExternalForm());
+        scene.getStylesheets().add(Stage1Chat.class.getResource("styles1.css").toExternalForm());
         primaryStage.setTitle("Chat1");
         primaryStage.setScene(scene);
 

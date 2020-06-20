@@ -1,4 +1,4 @@
-package app.web.pavelk.сhat1.client;
+package app.web.pavelk.сhat1.client.stage2;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +21,7 @@ public class Stage2Client extends Stage {
         this.parentList = parentList;
         Parent root = null;
         try {
-            root = FXMLLoader.load(getClass().getResource("personal.fxml"));
+            root = FXMLLoader.load(getClass().getResource("stage2.fxml"));
             setTitle("personal window");
             Scene scene = new Scene(root, 300, 400);
             setScene(scene);

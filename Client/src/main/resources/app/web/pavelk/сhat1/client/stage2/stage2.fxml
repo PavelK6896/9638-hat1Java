@@ -3,7 +3,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.Button?>
 
-<VBox fx:controller="app.web.pavelk.сhat1.client.Controller2Client"
+<VBox fx:controller="app.web.pavelk.сhat1.client.stage2.Controller2Client"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
     <TextArea fx:id="textArea" VBox.vgrow="ALWAYS"/>
     <Button text="Send Message" fx:id="btn" onAction="#sendMessage"/>

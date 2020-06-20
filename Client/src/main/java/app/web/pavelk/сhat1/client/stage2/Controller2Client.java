@@ -1,4 +1,4 @@
-package app.web.pavelk.сhat1.client;
+package app.web.pavelk.сhat1.client.stage2;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;

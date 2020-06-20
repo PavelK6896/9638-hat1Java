@@ -1,5 +1,6 @@
-package app.web.pavelk.сhat1.client;
+package app.web.pavelk.сhat1.client.stage1;
 
+import app.web.pavelk.сhat1.client.stage2.Stage2Client;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
@@ -61,19 +62,18 @@ public class Controller1Chat implements Initializable {
         }
     }
 
-    public void working() {
-        try {
-            socket = new Socket(IP_ADDRESS, PORT);
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
-            setAuthorized(false);
-
-            Thread thread = new Thread(() -> {
+    public void authorization() {
+        Thread thread = new Thread(() -> {
+            if (connect()) {
                 try {
+                    out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
+                    loginField.clear();
+                    passwordField.clear();
                     while (true) {
                         String str = in.readUTF();
                         if (str.startsWith("/authok")) {
-                            setAuthorized(true);
+                            Controller1Chat.this.setAuthorized(true);
+                            work();
                             break;
                         } else {
                             for (TextArea o : textAreas) {
@@ -81,38 +81,60 @@ public class Controller1Chat implements Initializable {
                             }
                         }
                     }
-                    while (true) {
-                        String str = in.readUTF();
-                        if (str.startsWith("/")) {
-                            if (str.equals("/serverclosed")) break;
-                            if (str.startsWith("/clientslist ")) {
-                                String[] tokens = str.split(" ");
-                                Platform.runLater(() -> {
-                                    clientsList.getItems().clear();
-                                    for (int i = 1; i < tokens.length; i++) {
-                                        clientsList.getItems().add(tokens[i]);
-                                    }
-                                });
-                            }
-                        } else {
-                            chatArea.appendText(str + "\n");
-                        }
-                    }
                 } catch (IOException e) {
+                    chatArea.appendText("ошибка авторизации\n");
                     e.printStackTrace();
-                } finally {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    setAuthorized(false);
                 }
-            });
-            thread.setDaemon(true);
-            thread.start();
+            }
+        });
+
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    public boolean connect() {
+        if (socket == null || socket.isClosed()) {
+            try {
+                socket = new Socket(IP_ADDRESS, PORT);
+                in = new DataInputStream(socket.getInputStream());
+                out = new DataOutputStream(socket.getOutputStream());
+            } catch (IOException e) {
+                chatArea.appendText("ошибка подключения к серверу\n");
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void work() {
+        try {
+            while (true) {
+                String str = in.readUTF();
+                if (str.startsWith("/")) {
+                    if (str.equals("/serverclosed")) break;
+                    if (str.startsWith("/clientslist ")) {
+                        String[] tokens = str.split(" ");
+                        Platform.runLater(() -> {
+                            clientsList.getItems().clear();
+                            for (int i = 1; i < tokens.length; i++) {
+                                clientsList.getItems().add(tokens[i]);
+                            }
+                        });
+                    }
+                } else {
+                    chatArea.appendText(str + "\n");
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Controller1Chat.this.setAuthorized(false);
         }
     }
 
@@ -126,18 +148,6 @@ public class Controller1Chat implements Initializable {
         }
     }
 
-    public void tryToAuth() {
-        if (socket == null || socket.isClosed()) {
-            working();
-        }
-        try {
-            out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
-            loginField.clear();
-            passwordField.clear();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void selectClient(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
@@ -146,3 +156,4 @@ public class Controller1Chat implements Initializable {
         }
     }
 }
+
