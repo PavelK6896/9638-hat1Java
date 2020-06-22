@@ -8,7 +8,7 @@ public class Service1Authorization {
 
     public static void connect() {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:Server/users.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:Server/chat1.db");
             stmt = connection.createStatement();
             System.out.println("connect database");
         } catch (Exception e) {

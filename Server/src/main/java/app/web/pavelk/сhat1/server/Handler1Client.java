@@ -38,20 +38,21 @@ public class Handler1Client {
                         String newNick = Service1Authorization.getNickByLoginAndPass(tokens[1], tokens[2]);
                         if (newNick != null) {
                             if (!server.isNickBusy(newNick)) {
+                                System.out.println("клиент авторизовался");
                                 sendMessage("/authok");
                                 nick = newNick;
                                 server.subscribe(this);
-                                break;
+                                continue;
                             } else {
                                 sendMessage("Учетная запись уже используется");
+                                continue;
                             }
                         } else {
                             sendMessage("Неверный логин/пароль");
+                            continue;
                         }
                     }
-                }
-                while (true) {
-                    String str = in.readUTF();
+
                     if (str.startsWith("/")) {
                         if (str.equals("/end")) {
                             out.writeUTF("/serverclosed");

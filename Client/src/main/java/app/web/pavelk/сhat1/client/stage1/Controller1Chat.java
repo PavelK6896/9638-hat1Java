@@ -7,6 +7,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,14 +23,18 @@ import java.util.ResourceBundle;
 
 public class Controller1Chat implements Initializable {
     public TextField msgField;
-    public TextArea TextArea;
+    public TextArea workTextArea;
     public HBox bottomPanel;
-    public VBox upperPanel;
+    public VBox authorizationVBox;
     public TextField loginField;
     public PasswordField passwordField;
     public ListView<String> clientsList;
     public CheckMenuItem CheckMenuItemWhite;
     public CheckMenuItem CheckMenuItemBlack;
+    public HBox workHBox;
+    public VBox basicVBox;
+    public Text authorizationText;
+
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
@@ -38,26 +44,33 @@ public class Controller1Chat implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setAuthorized(false);
-        textAreas = new ArrayList<>();
-        textAreas.add(TextArea);
+            setAuthorized(false);
     }
 
     public void setAuthorized(boolean isAuthorized) {
         if (!isAuthorized) {
-            upperPanel.setVisible(true);
-            upperPanel.setManaged(true);
-            bottomPanel.setVisible(false);
-            bottomPanel.setManaged(false);
-            clientsList.setVisible(false);
-            clientsList.setManaged(false);
+            authorizationVBox.setVisible(true);
+            authorizationVBox.setManaged(true);
+            workHBox.setVisible(false);
+            workHBox.setManaged(false);
+            textAreas = new ArrayList<>();
+            textAreas.add(workTextArea);
+
         } else {
-            upperPanel.setVisible(false);
-            upperPanel.setManaged(false);
+            authorizationVBox.setVisible(false);
+            authorizationVBox.setManaged(false);
+            workHBox.setVisible(true);
+            workHBox.setManaged(true);
+            Stage stage = (Stage) workHBox.getScene().getWindow();
+            stage.setWidth(300);
+            stage.setHeight(400);
             bottomPanel.setVisible(true);
             bottomPanel.setManaged(true);
             clientsList.setVisible(true);
             clientsList.setManaged(true);
+
+            workTextArea.setPrefSize(100, 100);
+            clientsList.setPrefSize(100, 100);
         }
     }
 
@@ -66,12 +79,12 @@ public class Controller1Chat implements Initializable {
             if (connect()) {
                 try {
                     out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
-                    loginField.clear();
+                 //   loginField.clear();
                     passwordField.clear();
                     while (true) {
                         String str = in.readUTF();
                         if (str.startsWith("/authok")) {
-                            Controller1Chat.this.setAuthorized(true);
+                            setAuthorized(true);
                             work();
                             break;
                         } else {
@@ -81,7 +94,7 @@ public class Controller1Chat implements Initializable {
                         }
                     }
                 } catch (IOException e) {
-                    TextArea.appendText("ошибка авторизации\n");
+                    authorizationText.setText("ошибка авторизации\n");
                     e.printStackTrace();
                 }
             }
@@ -98,7 +111,7 @@ public class Controller1Chat implements Initializable {
                 in = new DataInputStream(socket.getInputStream());
                 out = new DataOutputStream(socket.getOutputStream());
             } catch (IOException e) {
-                TextArea.appendText("ошибка подключения к серверу\n");
+                authorizationText.setText("ошибка подключения к серверу\n");
                 e.printStackTrace();
                 return false;
             }
@@ -122,7 +135,7 @@ public class Controller1Chat implements Initializable {
                         });
                     }
                 } else {
-                    TextArea.appendText(str + "\n");
+                    workTextArea.appendText(str + "\n");
                 }
             }
         } catch (IOException e) {
@@ -139,7 +152,7 @@ public class Controller1Chat implements Initializable {
 
     public void sendMessage() {
         try {
-            out.writeUTF( msgField.getText() +" "+  getCurrentTime());
+            out.writeUTF(msgField.getText() + " " + getCurrentTime());
             msgField.clear();
             msgField.requestFocus();
         } catch (IOException e) {
@@ -155,38 +168,39 @@ public class Controller1Chat implements Initializable {
         }
     }
 
-    public void setBlack(){
+    public void setBlack() {
         CheckMenuItemWhite.setSelected(false);
         CheckMenuItemBlack.setSelected(true);
         Stage1Chat.setCss("styles1");
     }
 
-    public void setWhite(){
+    public void setWhite() {
         CheckMenuItemWhite.setSelected(true);
         CheckMenuItemBlack.setSelected(false);
         Stage1Chat.setCss("styles2");
     }
 
-    public void exit(){
+    public void exit() {
         Platform.exit();
     }
 
-    public void stage1About(){
+    public void stage1About() {
         try {
+            if (out != null){
+                out.writeUTF("/end");
+            }
             Stage1Chat.setFXML("stage1About");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void clearTextArea(){
-        TextArea.clear();
+    public void clearTextArea() {
+        workTextArea.clear();
     }
 
     public String getCurrentTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
     }
-
-
 }
 
