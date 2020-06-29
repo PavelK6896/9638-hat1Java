@@ -27,8 +27,8 @@
     <VBox fx:id="authorizationVBox">
         <Text fx:id="authorizationText">ведите логин пароль</Text>
         <TextField fx:id="loginField" promptText="Логин" HBox.hgrow="ALWAYS"/>
-        <PasswordField fx:id="passwordField" onAction="#authorization" promptText="Пароль"/>
-        <Button fx:id="authorization" onAction="#authorization" text="Авторизоваться"/>
+        <PasswordField fx:id="passwordField" onAction="#authorization1" promptText="Пароль"/>
+        <Button fx:id="authorization1" onAction="#authorization1" text="Авторизоваться"/>
     </VBox>
 
     <HBox fx:id="workHBox" VBox.vgrow="ALWAYS">
@@ -40,7 +40,7 @@
                 <Button fx:id="sendMessage" onAction="#sendMessage" text="Отправить"/>
             </HBox>
         </VBox>
-        <ListView fx:id="clientsList" onMouseClicked="#selectClient" />
+        <ListView fx:id="clientsList" onMouseClicked="#selectClient"/>
     </HBox>
 
 </VBox>

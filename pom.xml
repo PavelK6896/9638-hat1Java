@@ -18,7 +18,6 @@
     <modules>
         <module>Server</module>
         <module>Client</module>
-        <module>JavaFXExample</module>
     </modules>
 
 

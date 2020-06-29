@@ -10,15 +10,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller1Chat implements Initializable {
@@ -34,17 +29,19 @@ public class Controller1Chat implements Initializable {
     public HBox workHBox;
     public VBox basicVBox;
     public Text authorizationText;
+    public boolean work = true;
 
-    Socket socket;
-    DataInputStream in;
-    DataOutputStream out;
-    final String IP_ADDRESS = "localhost";
-    final int PORT = 8189;
-    List<TextArea> textAreas;
+    public Session session;
+
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-            setAuthorized(false);
+
+
     }
 
     public void setAuthorized(boolean isAuthorized) {
@@ -53,8 +50,6 @@ public class Controller1Chat implements Initializable {
             authorizationVBox.setManaged(true);
             workHBox.setVisible(false);
             workHBox.setManaged(false);
-            textAreas = new ArrayList<>();
-            textAreas.add(workTextArea);
 
         } else {
             authorizationVBox.setVisible(false);
@@ -71,58 +66,57 @@ public class Controller1Chat implements Initializable {
 
             workTextArea.setPrefSize(100, 100);
             clientsList.setPrefSize(100, 100);
+
+            System.out.println(session.socket);
+            session.executorService.submit(() -> {
+                work();
+            });
+
         }
     }
 
-    public void authorization() {
-        Thread thread = new Thread(() -> {
-            if (connect()) {
+
+    public void authorization1() {
+
+        session.executorService.submit(() -> {
+
+            if (session.connect()) {
                 try {
-                    out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
-                 //   loginField.clear();
+                    session.out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
                     passwordField.clear();
+                    loginField.clear();
                     while (true) {
-                        String str = in.readUTF();
+                        String str = session.in.readUTF();
                         if (str.startsWith("/authok")) {
+                            // textAreas.add(workTextArea);
+                            session.setActive(true);
                             setAuthorized(true);
-                            work();
                             break;
                         } else {
-                            for (TextArea o : textAreas) {
-                                o.appendText(str + "\n");
-                            }
+                            authorizationText.setText(str + " ");
+                            break;
                         }
                     }
                 } catch (IOException e) {
+
                     authorizationText.setText("ошибка авторизации\n");
+
                     e.printStackTrace();
                 }
+            } else {
+                authorizationText.setText("ошибка подключения к серверу\n");
             }
         });
-
-        thread.setDaemon(true);
-        thread.start();
     }
 
-    public boolean connect() {
-        if (socket == null || socket.isClosed()) {
-            try {
-                socket = new Socket(IP_ADDRESS, PORT);
-                in = new DataInputStream(socket.getInputStream());
-                out = new DataOutputStream(socket.getOutputStream());
-            } catch (IOException e) {
-                authorizationText.setText("ошибка подключения к серверу\n");
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return true;
-    }
 
     public void work() {
         try {
-            while (true) {
-                String str = in.readUTF();
+
+            while (work) {
+
+                String str = session.in.readUTF();
+
                 if (str.startsWith("/")) {
                     if (str.equals("/serverclosed")) break;
                     if (str.startsWith("/clientslist ")) {
@@ -140,19 +134,12 @@ public class Controller1Chat implements Initializable {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Controller1Chat.this.setAuthorized(false);
         }
     }
 
     public void sendMessage() {
         try {
-            out.writeUTF(msgField.getText() + " " + getCurrentTime());
+            session.out.writeUTF(msgField.getText() + " " + getCurrentTime());
             msgField.clear();
             msgField.requestFocus();
         } catch (IOException e) {
@@ -163,7 +150,8 @@ public class Controller1Chat implements Initializable {
 
     public void selectClient(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
-            Stage2Client stage2Client = new Stage2Client(clientsList.getSelectionModel().getSelectedItem(), out, textAreas);
+            Stage2Client stage2Client =
+                    new Stage2Client(clientsList.getSelectionModel().getSelectedItem(), session.out, session.textAreas);
             stage2Client.show();
         }
     }
@@ -186,10 +174,8 @@ public class Controller1Chat implements Initializable {
 
     public void stage1About() {
         try {
-            if (out != null){
-                out.writeUTF("/end");
-            }
-            Stage1Chat.setFXML("stage1About");
+            Stage1Chat.setFXML("stage1About", session);
+            session.out.writeUTF("/end1");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -202,5 +188,7 @@ public class Controller1Chat implements Initializable {
     public String getCurrentTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
     }
+
+
 }
 

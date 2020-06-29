@@ -54,9 +54,15 @@ public class Handler1Client {
                     }
 
                     if (str.startsWith("/")) {
+                        if (str.equals("/end1")) {
+                            out.writeUTF("/serverclosed");
+                        }
                         if (str.equals("/end")) {
                             out.writeUTF("/serverclosed");
                             break;
+                        }
+                        if (str.equals("/start1")) {
+                            server.broadcastClientsList();
                         }
                         if (str.startsWith("/w ")) {
                             String[] tokens = str.split(" ", 3);
